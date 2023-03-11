@@ -23,9 +23,6 @@
 
         socket.on('addBall', ({ balls, newBallId }) => {
 
-            if (!myID) {
-                myID = newBallId;
-            }
             // Select all div elements
             const divs = document.querySelectorAll('div');
 
@@ -47,8 +44,8 @@
                 document.body.appendChild(newBall);
             });
 
-            // add a keyboard event listener to the ball element
-            window.addEventListener('keydown', (event) => {
+            const handleKeyDown = (event) => {
+                // handle keydown event
                 const currBall = document.getElementById(myID);
                 console.log("newBall Listener", myID)
 
@@ -79,7 +76,12 @@
                     default:
                         return;
                 }
-            });
+            };
+
+            if (!myID) {
+                window.addEventListener('keydown', handleKeyDown);
+                myID = newBallId;
+            }
         });
 
         socket.on('removeBall', (ballId) => {
