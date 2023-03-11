@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Balls</title>
+    <style>
+        .ball {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+    </style>
+
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+
+    <script>
+        const socket = io();
+        let myID;
+
+        socket.on('addBall', ({ balls, newBallId }) => {
+
+            if (!myID) {
+                myID = newBallId;
+            }
+            // Select all div elements
+            const divs = document.querySelectorAll('div');
+
+            // Remove each div element from the DOM
+            divs.forEach(div => {
+                div.parentNode.removeChild(div);
+            });
+
+            balls.forEach((ball) => {
+                // create a new ball element and append it to the body
+                const newBall = document.createElement('div');
+
+                newBall.classList.add('ball');
+                newBall.id = ball.ballId;
+                console.log("id, ", newBall.id)
+                newBall.style.top = ball.top + 'px';
+                newBall.style.left = ball.left + 'px';
+                newBall.style.backgroundColor = ball.color;
+                document.body.appendChild(newBall);
+            });
+
+            // add a keyboard event listener to the ball element
+            window.addEventListener('keydown', (event) => {
+                const currBall = document.getElementById(myID);
+                console.log("newBall Listener", myID)
+
+                switch (event.key) {
+                    case 'ArrowUp':
+                        currBall.style.top = (currBall.offsetTop - 10) + 'px';
+                        // emit a 'move' event to the server
+                        socket.emit('move', { x: currBall.offsetLeft, y: currBall.offsetTop , ballId: myID});
+                        break;
+
+                    case 'ArrowDown':
+                        currBall.style.top = (currBall.offsetTop + 10) + 'px';
+                        // emit a 'move' event to the server
+                        socket.emit('move', { x: currBall.offsetLeft, y: currBall.offsetTop , ballId: myID});
+                        break;
+
+                    case 'ArrowLeft':
+                        currBall.style.left = (currBall.offsetLeft - 10) + 'px';
+                        // emit a 'move' event to the server
+                        socket.emit('move', { x: currBall.offsetLeft, y: currBall.offsetTop , ballId: myID});
+                        break;
+
+                    case 'ArrowRight':
+                        currBall.style.left = (currBall.offsetLeft + 10) + 'px';
+                        // emit a 'move' event to the server
+                        socket.emit('move', { x: currBall.offsetLeft, y: currBall.offsetTop , ballId: myID});
+                        break;
+                    default:
+                        return;
+                }
+            });
+        });
+
+        socket.on('removeBall', (ballId) => {
+            const ball = document.getElementById(ballId);
+            document.body.removeChild(ball);
+        });
+
+        socket.on('updatePosition', (data) => {
+
+            console.log("data_to_update:", data);
+            const ballId = data.ballId;
+            // console.log("pos", ballId);
+
+            const updatedBall = document.getElementById(ballId);
+            console.log(updatedBall)
+            updatedBall.style.left = data.x + 'px';
+            updatedBall.style.top = data.y + 'px';
+
+            console.log(`>>>After update= left: ${updatedBall.style.left}, top:${updatedBall.style.top}`);
+        });
+
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
