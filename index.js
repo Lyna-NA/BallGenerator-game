@@ -43,8 +43,7 @@ io.on("connection", (socket) => {
   console.log(balls);
   // console.log("ballId >>>>", ballId);
 
-  const newBallId = ballId;
-  io.emit("addBall", ({balls, newBallId}));
+  io.emit("addBall", balls);
 
   //when disconnect
   socket.on("disconnect", () => {

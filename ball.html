@@ -19,30 +19,13 @@
 
     <script>
         const socket = io();
+
+        // flag to check if the game has been initialized
         let myID;
 
-        socket.on('addBall', ({ balls, newBallId }) => {
+        socket.on('addBall', (balls) => {
 
-            // Select all div elements
-            const divs = document.querySelectorAll('div');
-
-            // Remove each div element from the DOM
-            divs.forEach(div => {
-                div.parentNode.removeChild(div);
-            });
-
-            balls.forEach((ball) => {
-                // create a new ball element and append it to the body
-                const newBall = document.createElement('div');
-
-                newBall.classList.add('ball');
-                newBall.id = ball.ballId;
-                console.log("id, ", newBall.id)
-                newBall.style.top = ball.top + 'px';
-                newBall.style.left = ball.left + 'px';
-                newBall.style.backgroundColor = ball.color;
-                document.body.appendChild(newBall);
-            });
+            const lastAddedBall = balls[balls.length - 1];
 
             const handleKeyDown = (event) => {
                 // handle keydown event
@@ -79,8 +62,36 @@
             };
 
             if (!myID) {
+                
+                balls.forEach((ball) => {
+                    // create a new ball element and append it to the body
+                    const newBall = document.createElement('div');
+
+                    newBall.classList.add('ball');
+                    newBall.id = ball.ballId;
+                    console.log("id, ", newBall.id)
+                    newBall.style.top = ball.top + 'px';
+                    newBall.style.left = ball.left + 'px';
+                    newBall.style.backgroundColor = ball.color;
+                    document.body.appendChild(newBall);
+                });
+
                 window.addEventListener('keydown', handleKeyDown);
-                myID = newBallId;
+                myID = lastAddedBall.ballId;
+            }
+            else{
+                console.log("lastAddedBall:", lastAddedBall)
+
+                // create a new ball element and append it to the body
+                const newBall = document.createElement('div');
+
+                newBall.classList.add('ball');
+                newBall.id = lastAddedBall.ballId;
+                console.log("id, ", lastAddedBall.id)
+                newBall.style.top = lastAddedBall.top + 'px';
+                newBall.style.left = lastAddedBall.left + 'px';
+                newBall.style.backgroundColor = lastAddedBall.color;
+                document.body.appendChild(newBall);
             }
         });
 
